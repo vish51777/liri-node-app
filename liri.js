@@ -4,24 +4,27 @@ var Spotify = require('node-spotify-api');
 var spotify = new Spotify(keys.spotify);
 var axios = require('axios');
 var moment = require('moment');
+var fs = require('fs');
+
 switch (process.argv[2]){
   case "spotify-this-song":
-    spotifyThisSong();
+    spotifyThisSong(process.argv[3]);
     break;
   case "concert-this":
-    concertThis();
+    concertThis(process.argv[3]);
     break;
   case "movie-this":
-    movieThis();
+    movieThis(process.argv[3]);
     break;
   case "do-what-it-says":
+    doWhatItSays();
     break;
   default:
   console.log("Unkown comand!: ",process.argv[2]);
 }
 //Will send you spotify info for a song, defaults to ace of base if nothing is inputted
-function spotifyThisSong() {
-    let songTitle = process.argv[3]
+function spotifyThisSong(arg) {
+    let songTitle = arg
     //Code for if no song is entered
     if(!songTitle) {
         spotify
@@ -49,7 +52,7 @@ function spotifyThisSong() {
               console.log(artist.name); 
           }
           console.log("Song Name:");
-          console.log(process.argv[3]);
+          console.log(arg);
           console.log("Song Preview:");
           console.log(data.tracks.items[0].preview_url);
           console.log("Album Name:");
@@ -58,12 +61,12 @@ function spotifyThisSong() {
     }
   }
 //Will figure out where latest the concert is of an inputted artist
-function concertThis() {
-if(!process.argv[3]){
+function concertThis(arg) {
+if(!arg){
   console.log("Input an artist!")
   return;
 }
-  axios.get("https://rest.bandsintown.com/artists/" + process.argv[3] + "/events?app_id=codingbootcamp")
+  axios.get("https://rest.bandsintown.com/artists/" + arg + "/events?app_id=codingbootcamp")
   .then(function (response) {
     console.log("Venue name:")
     console.log(response.data[0].venue.name);
@@ -78,9 +81,9 @@ if(!process.argv[3]){
   });
 }
 //Will give you info on a movie title you search
-function movieThis() {
+function movieThis(arg) {
   //First checks to see if a movie title was inputted, using or, if a movie was inputted mr.nobody will be ran
-  let query = process.argv[3] || "Mr.Nobody";
+  let query = arg || "Mr.Nobody";
   axios.get("http://www.omdbapi.com/?apikey=trilogy&t=" + query)
   .then(function (response) {
     console.log(response.data);
@@ -103,4 +106,27 @@ function movieThis() {
   .catch(function (error) {
     console.log(error);
   });
+}
+//Reads and executes random.txt
+function doWhatItSays() {
+  //this allows txt file to be read
+  fs.readFile('random.txt', 'utf8', function(err, data) {
+    if (err) {
+      console.log(err);
+    }else{
+      var splitData = data.split(",");
+      switch (splitData[0]){
+        case "spotify-this-song":
+        spotifyThisSong(splitData[1]);
+        break;
+        case "concert-this":
+        concertThis(splitData[1]);
+        break;
+        case "movie-this":
+        movieThis(splitData[1]);
+        break;
+      }
+       
+    }
+  })
 }
