@@ -2,16 +2,29 @@ require("dotenv").config();
 var keys = require("./keys.js");
 var Spotify = require('node-spotify-api');
 var spotify = new Spotify(keys.spotify);
-
-  if (process.argv[2] === "spotify-this-song")  {
+var axios = require('axios');
+switch (process.argv[2]){
+  case "spotify-this-song":
+    spotifyThisSong();
+    break;
+  case "concert-this":
+    concertThis();
+    break;
+  case "movie-this":
+    break;
+  case "do-what-it-says":
+    break;
+  default:
+  console.log("Unkown comand!: ",process.argv[2]);
+}
+//Will send you spotify info for a song, defaults to ace of base if nothing is inputted
+function spotifyThisSong() {
     let songTitle = process.argv[3]
-    console.log("arrrrg", process.argv[3]);
     //Code for if no song is entered
     if(!songTitle) {
         spotify
             .request("https://api.spotify.com/v1/albums/5UwIyIyFzkM7wKeGtRJPgB")
             .then(function(data) {
-                console.log("***",JSON.stringify(data,null,2));
                 console.log("artist list:");
                 console.log(data.artists[0].name);
                 console.log("Song Name:");
@@ -29,7 +42,6 @@ var spotify = new Spotify(keys.spotify);
             if (err) {
               return console.log('Error occurred: ' + err);
             } 
-          console.log(JSON.stringify(data.tracks,null,2)); 
           console.log("artist list:");
           for(let artist of data.tracks.items[0].album.artists){
               console.log(artist.name); 
@@ -43,3 +55,13 @@ var spotify = new Spotify(keys.spotify);
           });
     }
   }
+//Will figure out where the concert is
+function concertThis() {
+  axios.get("https://rest.bandsintown.com/artists/" + process.argv[3] + "/events?app_id=codingbootcamp")
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+}
