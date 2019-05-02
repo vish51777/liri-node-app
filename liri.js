@@ -12,6 +12,7 @@ switch (process.argv[2]){
     concertThis();
     break;
   case "movie-this":
+    movieThis();
     break;
   case "do-what-it-says":
     break;
@@ -71,6 +72,33 @@ if(!process.argv[3]){
     console.log("Date of the event: ")
     let d = new Date(response.data[0].datetime)
     console.log(moment(d).format("MM/DD/YYYY"));
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+}
+//Will give you info on a movie title you search
+function movieThis() {
+  //First checks to see if a movie title was inputted, using or, if a movie was inputted mr.nobody will be ran
+  let query = process.argv[3] || "Mr.Nobody";
+  axios.get("http://www.omdbapi.com/?apikey=trilogy&t=" + query)
+  .then(function (response) {
+    console.log(response.data);
+    console.log("Title of Movie:");
+    console.log(response.data.Title);
+    console.log("Year the movie came out: ");
+    console.log(response.data.Year);
+    console.log("IMDB rating of the movie: ");
+    console.log(response.data.imdbRating);
+    console.log("Rotten Tomatoes Rating of the movie");
+    console.log(response.data.Ratings[1].Value);
+    console.log("Country(ies) where the movie was produced: ")
+    console.log(response.data.Country);
+    console.log("Plot of the movie: ")
+    console.log(response.data.Plot);
+    console.log("Actors in the movie: ")
+    console.log(response.data.Actors);
+
   })
   .catch(function (error) {
     console.log(error);
