@@ -3,6 +3,7 @@ var keys = require("./keys.js");
 var Spotify = require('node-spotify-api');
 var spotify = new Spotify(keys.spotify);
 var axios = require('axios');
+var moment = require('moment');
 switch (process.argv[2]){
   case "spotify-this-song":
     spotifyThisSong();
@@ -55,11 +56,21 @@ function spotifyThisSong() {
           });
     }
   }
-//Will figure out where the concert is
+//Will figure out where latest the concert is of an inputted artist
 function concertThis() {
+if(!process.argv[3]){
+  console.log("Input an artist!")
+  return;
+}
   axios.get("https://rest.bandsintown.com/artists/" + process.argv[3] + "/events?app_id=codingbootcamp")
   .then(function (response) {
-    console.log(response);
+    console.log("Venue name:")
+    console.log(response.data[0].venue.name);
+    console.log("Venue location: ")
+    console.log(response.data[0].venue.city)
+    console.log("Date of the event: ")
+    let d = new Date(response.data[0].datetime)
+    console.log(moment(d).format("MM/DD/YYYY"));
   })
   .catch(function (error) {
     console.log(error);
